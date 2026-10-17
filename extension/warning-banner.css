@@ -1,0 +1,162 @@
+/* Full page click-blocking layer with blur */
+#gov-shield-screen-blocker {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 2147483646;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(4px);
+  cursor: not-allowed;
+  pointer-events: all;
+}
+
+/* Centered Modal Container */
+#gov-shield-root {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2147483647;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  pointer-events: auto;
+}
+
+/* Dark Mode Centered Card */
+.gov-shield-card {
+  width: 380px;
+  background: #121214;
+  border: 1px solid #2d2d32;
+  border-radius: 14px;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.8), 0 0 0 1px rgba(255, 255, 255, 0.05);
+  padding: 24px;
+  box-sizing: border-box;
+  color: #f3f4f6;
+  animation: govShieldScaleIn 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes govShieldScaleIn {
+  from {
+    transform: scale(0.95);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.gov-shield-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.gov-shield-icon-badge {
+  width: 40px;
+  height: 40px;
+  background-color: rgba(239, 68, 68, 0.15);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #ef4444;
+  font-size: 20px;
+  flex-shrink: 0;
+}
+
+.gov-shield-title {
+  font-size: 16px;
+  font-weight: 700;
+  color: #f87171;
+  margin: 0;
+  line-height: 1.2;
+}
+
+.gov-shield-body {
+  font-size: 13px;
+  color: #9ca3af;
+  line-height: 1.5;
+  margin-bottom: 16px;
+}
+
+.gov-shield-status-box {
+  background: rgba(239, 68, 68, 0.1);
+  border-left: 3px solid #ef4444;
+  padding: 8px 12px;
+  font-size: 12px;
+  color: #fca5a5;
+  border-radius: 0 6px 6px 0;
+  margin-bottom: 16px;
+  font-weight: 500;
+}
+
+/* Checkbox option row */
+.gov-shield-checkbox-container {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 16px 0 20px 0;
+  cursor: pointer;
+  user-select: none;
+}
+
+.gov-shield-checkbox-container input {
+  width: 16px;
+  height: 16px;
+  accent-color: #dc2626;
+  cursor: pointer;
+}
+
+.gov-shield-checkbox-label {
+  font-size: 13px;
+  color: #d1d5db;
+}
+
+.gov-shield-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.gov-shield-btn-danger {
+  width: 100%;
+  padding: 10px 14px;
+  background-color: #dc2626;
+  color: #ffffff;
+  border: none;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.gov-shield-btn-danger:hover {
+  background-color: #b91c1c;
+}
+
+.gov-shield-btn-secondary {
+  width: 100%;
+  padding: 9px 14px;
+  background-color: #27272a;
+  color: #d1d5db;
+  border: 1px solid #3f3f46;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s, color 0.2s;
+}
+
+.gov-shield-btn-secondary:hover {
+  background-color: #3f3f46;
+  color: #ffffff;
+}

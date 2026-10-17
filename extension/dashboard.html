@@ -1,0 +1,1026 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>WebSleuth AI — AI Fake Website Protector | Powered by IBM LinuxONE</title>
+  <meta name="description" content="WebSleuth AI protects you from fake government and phishing websites using AI. Powered by IBM LinuxONE for maximum security."/>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+  <style>
+    /* ═══════════════════════════════════════════════════════
+       DESIGN TOKENS
+    ═══════════════════════════════════════════════════════ */
+    :root {
+      --bg:          #070b14;
+      --bg2:         #0d1526;
+      --bg3:         #111c35;
+      --surface:     rgba(255,255,255,0.04);
+      --surface-h:   rgba(255,255,255,0.08);
+      --border:      rgba(255,255,255,0.08);
+      --border-h:    rgba(0,212,255,0.3);
+
+      --cyan:        #00d4ff;
+      --cyan-d:      #0099bb;
+      --purple:      #7c3aed;
+      --purple-l:    #a78bfa;
+      --danger:      #ef4444;
+      --danger-d:    #b91c1c;
+      --success:     #22c55e;
+      --success-d:   #15803d;
+      --warn:        #f59e0b;
+
+      --text:        #f0f4ff;
+      --text-muted:  #8896b0;
+      --text-dim:    #4a5568;
+
+      --r-sm: 8px;
+      --r-md: 16px;
+      --r-lg: 24px;
+      --r-xl: 32px;
+
+      --glow-cyan:   0 0 30px rgba(0,212,255,0.25);
+      --glow-purple: 0 0 30px rgba(124,58,237,0.25);
+      --glow-danger: 0 0 30px rgba(239,68,68,0.3);
+      --glow-safe:   0 0 30px rgba(34,197,94,0.3);
+    }
+
+    /* ═══════════════════════════════════════════════════════
+       RESET & BASE
+    ═══════════════════════════════════════════════════════ */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* Animated grid background */
+    body::before {
+      content: '';
+      position: fixed; inset: 0;
+      background-image:
+        linear-gradient(rgba(0,212,255,0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0,212,255,0.03) 1px, transparent 1px);
+      background-size: 60px 60px;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* ═══════════════════════════════════════════════════════
+       NAVBAR
+    ═══════════════════════════════════════════════════════ */
+    nav {
+      position: sticky; top: 0; z-index: 100;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 16px 40px;
+      background: rgba(7,11,20,0.85);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .nav-brand {
+      display: flex; align-items: center; gap: 12px;
+      text-decoration: none;
+    }
+
+    .nav-logo {
+      width: 36px; height: 36px;
+      background: linear-gradient(135deg, var(--cyan), var(--purple));
+      border-radius: 10px;
+      display: grid; place-items: center;
+      font-size: 18px;
+      box-shadow: var(--glow-cyan);
+    }
+
+    .nav-title {
+      font-size: 20px; font-weight: 800;
+      background: linear-gradient(135deg, var(--cyan), var(--purple-l));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    }
+
+    .nav-links {
+      display: flex; align-items: center; gap: 8px;
+    }
+
+    .nav-links a {
+      color: var(--text-muted);
+      text-decoration: none; font-size: 14px; font-weight: 500;
+      padding: 8px 16px; border-radius: var(--r-sm);
+      transition: all 0.2s;
+    }
+    .nav-links a:hover, .nav-links a.active {
+      color: var(--cyan);
+      background: rgba(0,212,255,0.08);
+    }
+
+    .nav-badge {
+      display: flex; align-items: center; gap: 6px;
+      padding: 6px 14px; border-radius: 20px;
+      background: rgba(0,212,255,0.1);
+      border: 1px solid rgba(0,212,255,0.2);
+      font-size: 12px; font-weight: 600; color: var(--cyan);
+    }
+
+    .pulse-dot {
+      width: 7px; height: 7px; border-radius: 50%;
+      background: var(--success);
+      box-shadow: 0 0 8px var(--success);
+      animation: pulse-anim 2s ease-in-out infinite;
+    }
+    @keyframes pulse-anim {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.6; transform: scale(1.4); }
+    }
+
+    /* ═══════════════════════════════════════════════════════
+       HERO
+    ═══════════════════════════════════════════════════════ */
+    .hero {
+      position: relative; z-index: 1;
+      text-align: center;
+      padding: 80px 40px 60px;
+      overflow: hidden;
+    }
+
+    .hero::before {
+      content: '';
+      position: absolute; top: -200px; left: 50%; transform: translateX(-50%);
+      width: 700px; height: 700px; border-radius: 50%;
+      background: radial-gradient(ellipse, rgba(0,212,255,0.08) 0%, transparent 70%);
+      pointer-events: none;
+    }
+
+    .hero-eyebrow {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 6px 16px; border-radius: 20px;
+      background: rgba(124,58,237,0.15);
+      border: 1px solid rgba(124,58,237,0.3);
+      font-size: 12px; font-weight: 600; color: var(--purple-l);
+      text-transform: uppercase; letter-spacing: 1.5px;
+      margin-bottom: 24px;
+    }
+
+    .hero h1 {
+      font-size: clamp(40px, 6vw, 72px);
+      font-weight: 900; line-height: 1.08;
+      margin-bottom: 20px;
+    }
+
+    .hero h1 span {
+      background: linear-gradient(135deg, var(--cyan) 0%, var(--purple-l) 100%);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    }
+
+    .hero p {
+      font-size: 18px; color: var(--text-muted); line-height: 1.7;
+      max-width: 600px; margin: 0 auto 40px;
+    }
+
+    /* ── URL CHECKER ── */
+    .url-checker {
+      max-width: 720px; margin: 0 auto;
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: var(--r-xl);
+      padding: 8px 8px 8px 20px;
+      display: flex; align-items: center; gap: 12px;
+      transition: border-color 0.3s, box-shadow 0.3s;
+    }
+    .url-checker:focus-within {
+      border-color: var(--cyan);
+      box-shadow: var(--glow-cyan);
+    }
+
+    #urlInput {
+      flex: 1; background: none; border: none; outline: none;
+      font-size: 15px; font-family: 'JetBrains Mono', monospace;
+      color: var(--text);
+    }
+    #urlInput::placeholder { color: var(--text-dim); }
+
+    #checkBtn {
+      padding: 14px 28px; border-radius: var(--r-md);
+      background: linear-gradient(135deg, var(--cyan), var(--purple));
+      border: none; cursor: pointer;
+      font-size: 14px; font-weight: 700; color: #fff;
+      letter-spacing: 0.5px;
+      transition: all 0.2s; white-space: nowrap;
+    }
+    #checkBtn:hover {
+      transform: scale(1.03);
+      box-shadow: 0 8px 24px rgba(0,212,255,0.4);
+    }
+    #checkBtn:active { transform: scale(0.98); }
+    #checkBtn:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+
+    /* ── RESULT CARD ── */
+    #resultCard {
+      max-width: 720px; margin: 20px auto 0;
+      border-radius: var(--r-lg);
+      padding: 24px;
+      display: none;
+      animation: slideUp 0.4s ease;
+    }
+    @keyframes slideUp {
+      from { opacity: 0; transform: translateY(16px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    #resultCard.safe {
+      background: rgba(34,197,94,0.08);
+      border: 1px solid rgba(34,197,94,0.3);
+      box-shadow: var(--glow-safe);
+    }
+    #resultCard.danger {
+      background: rgba(239,68,68,0.08);
+      border: 1px solid rgba(239,68,68,0.3);
+      box-shadow: var(--glow-danger);
+    }
+
+    .result-header {
+      display: flex; align-items: center; gap: 16px; margin-bottom: 16px;
+    }
+
+    .result-icon { font-size: 40px; }
+
+    .result-title { font-size: 22px; font-weight: 800; }
+    .result-sub { font-size: 14px; color: var(--text-muted); margin-top: 2px; }
+
+    .result-grid {
+      display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px;
+      margin-top: 16px;
+    }
+
+    .result-metric {
+      background: rgba(255,255,255,0.04);
+      border: 1px solid var(--border);
+      border-radius: var(--r-md);
+      padding: 14px 16px;
+    }
+    .result-metric .label {
+      font-size: 11px; font-weight: 600; color: var(--text-muted);
+      text-transform: uppercase; letter-spacing: 1px;
+    }
+    .result-metric .value {
+      font-size: 22px; font-weight: 800; margin-top: 4px;
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    .risk-bar-wrap { margin-top: 16px; }
+    .risk-bar-label { font-size: 12px; color: var(--text-muted); margin-bottom: 6px;
+      display: flex; justify-content: space-between; }
+    .risk-bar-track {
+      height: 8px; border-radius: 99px;
+      background: rgba(255,255,255,0.08); overflow: hidden;
+    }
+    .risk-bar-fill {
+      height: 100%; border-radius: 99px;
+      transition: width 0.8s cubic-bezier(0.34,1.56,0.64,1);
+    }
+
+    .verified-alert {
+      margin-top: 16px; padding: 14px 16px;
+      border-radius: var(--r-md);
+      background: rgba(0,212,255,0.08);
+      border: 1px solid rgba(0,212,255,0.25);
+      display: flex; align-items: center; gap: 12px;
+      font-size: 14px;
+    }
+    .verified-alert a {
+      color: var(--cyan); font-weight: 600; text-decoration: none;
+    }
+    .verified-alert a:hover { text-decoration: underline; }
+
+    .reason-text {
+      margin-top: 14px; padding: 12px 16px;
+      background: rgba(255,255,255,0.03);
+      border-left: 3px solid var(--warn);
+      border-radius: 0 var(--r-sm) var(--r-sm) 0;
+      font-size: 13px; color: var(--text-muted); line-height: 1.5;
+    }
+
+    /* ═══════════════════════════════════════════════════════
+       STATS BAR
+    ═══════════════════════════════════════════════════════ */
+    .stats-bar {
+      position: relative; z-index: 1;
+      display: grid; grid-template-columns: repeat(4, 1fr);
+      gap: 1px;
+      background: var(--border);
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .stat-item {
+      background: var(--bg);
+      padding: 28px 32px;
+      text-align: center;
+    }
+
+    .stat-num {
+      font-size: 42px; font-weight: 900;
+      font-family: 'JetBrains Mono', monospace;
+      background: linear-gradient(135deg, var(--cyan), var(--purple-l));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      line-height: 1;
+    }
+
+    .stat-label {
+      font-size: 13px; font-weight: 500; color: var(--text-muted);
+      margin-top: 6px; text-transform: uppercase; letter-spacing: 0.8px;
+    }
+
+    /* ═══════════════════════════════════════════════════════
+       SECTIONS
+    ═══════════════════════════════════════════════════════ */
+    .section {
+      position: relative; z-index: 1;
+      padding: 80px 40px; max-width: 1280px; margin: 0 auto;
+    }
+
+    .section-header {
+      text-align: center; margin-bottom: 56px;
+    }
+
+    .section-tag {
+      display: inline-block;
+      padding: 4px 14px; border-radius: 20px;
+      background: rgba(0,212,255,0.1);
+      border: 1px solid rgba(0,212,255,0.2);
+      font-size: 11px; font-weight: 700; color: var(--cyan);
+      text-transform: uppercase; letter-spacing: 1.5px;
+      margin-bottom: 16px;
+    }
+
+    .section-header h2 {
+      font-size: clamp(28px, 4vw, 42px);
+      font-weight: 800; margin-bottom: 12px;
+    }
+
+    .section-header p {
+      font-size: 16px; color: var(--text-muted); max-width: 520px; margin: 0 auto;
+    }
+
+    /* ═══════════════════════════════════════════════════════
+       VERIFIED SITES
+    ═══════════════════════════════════════════════════════ */
+    .filter-bar {
+      display: flex; align-items: center; gap: 10px;
+      flex-wrap: wrap; margin-bottom: 32px;
+    }
+
+    .filter-search {
+      flex: 1; min-width: 200px;
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: var(--r-sm);
+      padding: 10px 16px;
+      color: var(--text); font-size: 14px; font-family: inherit;
+      outline: none; transition: border-color 0.2s;
+    }
+    .filter-search:focus { border-color: var(--cyan); }
+
+    .filter-btn {
+      padding: 9px 16px; border-radius: var(--r-sm);
+      border: 1px solid var(--border);
+      background: var(--surface); color: var(--text-muted);
+      font-size: 13px; font-weight: 500; cursor: pointer;
+      transition: all 0.2s; white-space: nowrap;
+    }
+    .filter-btn:hover, .filter-btn.active {
+      background: rgba(0,212,255,0.1);
+      border-color: rgba(0,212,255,0.3);
+      color: var(--cyan);
+    }
+
+    .sites-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 16px;
+    }
+
+    .site-card {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: var(--r-lg);
+      padding: 20px 22px;
+      transition: all 0.25s;
+      cursor: pointer;
+      text-decoration: none;
+      display: block;
+      color: inherit;
+    }
+    .site-card:hover {
+      border-color: var(--border-h);
+      transform: translateY(-3px);
+      box-shadow: var(--glow-cyan);
+      background: var(--bg3);
+    }
+
+    .site-card-header {
+      display: flex; align-items: center; gap: 12px; margin-bottom: 10px;
+    }
+    .site-icon {
+      width: 40px; height: 40px; border-radius: 10px;
+      background: rgba(0,212,255,0.1);
+      display: grid; place-items: center;
+      font-size: 20px; flex-shrink: 0;
+    }
+    .site-name { font-size: 15px; font-weight: 700; }
+    .site-domain {
+      font-size: 11px; font-family: 'JetBrains Mono', monospace;
+      color: var(--cyan); margin-top: 2px;
+    }
+
+    .site-desc {
+      font-size: 13px; color: var(--text-muted); line-height: 1.5;
+      margin-bottom: 14px;
+    }
+
+    .site-footer {
+      display: flex; align-items: center; justify-content: space-between;
+    }
+
+    .site-badge {
+      display: inline-flex; align-items: center; gap: 4px;
+      padding: 3px 10px; border-radius: 99px;
+      font-size: 11px; font-weight: 600;
+      background: rgba(34,197,94,0.12);
+      border: 1px solid rgba(34,197,94,0.3);
+      color: var(--success);
+    }
+
+    .site-category-label {
+      font-size: 11px; color: var(--text-dim); font-weight: 500;
+    }
+
+    /* ═══════════════════════════════════════════════════════
+       HOW IT WORKS
+    ═══════════════════════════════════════════════════════ */
+    .how-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+      gap: 20px;
+    }
+
+    .how-card {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: var(--r-lg);
+      padding: 28px 24px;
+      transition: all 0.25s;
+    }
+    .how-card:hover {
+      border-color: rgba(124,58,237,0.3);
+      box-shadow: var(--glow-purple);
+    }
+
+    .how-num {
+      width: 40px; height: 40px; border-radius: 12px;
+      background: linear-gradient(135deg, var(--cyan), var(--purple));
+      display: grid; place-items: center;
+      font-size: 16px; font-weight: 800; color: #fff;
+      margin-bottom: 16px;
+    }
+
+    .how-card h3 { font-size: 16px; font-weight: 700; margin-bottom: 8px; }
+    .how-card p { font-size: 14px; color: var(--text-muted); line-height: 1.6; }
+
+    /* ═══════════════════════════════════════════════════════
+       IBM LINUXONE SECTION
+    ═══════════════════════════════════════════════════════ */
+    .ibm-section {
+      position: relative; z-index: 1;
+      padding: 80px 40px;
+      background: linear-gradient(135deg, rgba(0,30,80,0.4), rgba(50,0,100,0.3));
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .ibm-inner {
+      max-width: 1280px; margin: 0 auto;
+      display: grid; grid-template-columns: 1fr 1fr; gap: 60px; align-items: center;
+    }
+
+    .ibm-text h2 {
+      font-size: 36px; font-weight: 800; margin-bottom: 16px;
+    }
+    .ibm-text h2 span {
+      background: linear-gradient(135deg, #0f62fe, var(--cyan));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    }
+    .ibm-text p {
+      font-size: 16px; color: var(--text-muted); line-height: 1.7; margin-bottom: 28px;
+    }
+
+    .ibm-features {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 14px;
+    }
+
+    .ibm-feat {
+      display: flex; align-items: flex-start; gap: 10px;
+      padding: 16px;
+      background: rgba(15,98,254,0.08);
+      border: 1px solid rgba(15,98,254,0.2);
+      border-radius: var(--r-md);
+    }
+    .ibm-feat-icon { font-size: 20px; flex-shrink: 0; margin-top: 2px; }
+    .ibm-feat h4 { font-size: 13px; font-weight: 700; margin-bottom: 3px; }
+    .ibm-feat p { font-size: 12px; color: var(--text-muted); line-height: 1.4; }
+
+    .ibm-visual {
+      background: var(--bg2);
+      border: 1px solid rgba(15,98,254,0.25);
+      border-radius: var(--r-xl);
+      padding: 28px;
+      box-shadow: 0 0 60px rgba(15,98,254,0.1);
+    }
+
+    .server-graphic {
+      background: var(--bg3);
+      border-radius: var(--r-md);
+      padding: 20px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px;
+      color: #5eead4;
+      line-height: 2;
+      border: 1px solid var(--border);
+    }
+
+    .server-graphic .dim { color: var(--text-dim); }
+    .server-graphic .cyan { color: var(--cyan); }
+    .server-graphic .green { color: var(--success); }
+    .server-graphic .purple { color: var(--purple-l); }
+
+    /* ═══════════════════════════════════════════════════════
+       LIVE FEED
+    ═══════════════════════════════════════════════════════ */
+    .feed-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+    }
+    .feed-table th {
+      padding: 12px 16px; text-align: left;
+      font-size: 11px; font-weight: 600; color: var(--text-muted);
+      text-transform: uppercase; letter-spacing: 1px;
+      border-bottom: 1px solid var(--border);
+    }
+    .feed-table td {
+      padding: 14px 16px;
+      border-bottom: 1px solid rgba(255,255,255,0.03);
+      color: var(--text-muted);
+    }
+    .feed-table tr:hover td { background: var(--surface); }
+    .feed-table td:first-child {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px; color: var(--text); max-width: 300px;
+      overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+    }
+
+    .badge-safe {
+      display: inline-flex; align-items: center; gap: 4px;
+      padding: 3px 10px; border-radius: 99px;
+      font-size: 11px; font-weight: 600;
+      background: rgba(34,197,94,0.12);
+      border: 1px solid rgba(34,197,94,0.25);
+      color: var(--success);
+    }
+    .badge-danger {
+      display: inline-flex; align-items: center; gap: 4px;
+      padding: 3px 10px; border-radius: 99px;
+      font-size: 11px; font-weight: 600;
+      background: rgba(239,68,68,0.12);
+      border: 1px solid rgba(239,68,68,0.25);
+      color: var(--danger);
+    }
+
+    .table-wrap {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: var(--r-lg);
+      overflow: hidden;
+    }
+
+    /* ═══════════════════════════════════════════════════════
+       REPORT FORM
+    ═══════════════════════════════════════════════════════ */
+    .report-wrap {
+      max-width: 600px; margin: 0 auto;
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: var(--r-xl);
+      padding: 36px;
+    }
+
+    .form-group { margin-bottom: 20px; }
+    .form-label { display: block; font-size: 13px; font-weight: 600;
+      color: var(--text-muted); margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.8px; }
+    .form-input {
+      width: 100%; background: var(--bg);
+      border: 1px solid var(--border); border-radius: var(--r-sm);
+      padding: 12px 16px; color: var(--text); font-size: 14px;
+      font-family: inherit; outline: none; transition: border-color 0.2s;
+    }
+    .form-input:focus { border-color: var(--cyan); }
+
+    .toggle-group {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 10px;
+    }
+    .toggle-btn {
+      padding: 12px; border-radius: var(--r-sm);
+      border: 2px solid var(--border);
+      background: var(--bg); color: var(--text-muted);
+      font-size: 14px; font-weight: 600; cursor: pointer;
+      transition: all 0.2s; text-align: center;
+    }
+    .toggle-btn.selected-safe {
+      border-color: var(--success); color: var(--success);
+      background: rgba(34,197,94,0.08);
+    }
+    .toggle-btn.selected-danger {
+      border-color: var(--danger); color: var(--danger);
+      background: rgba(239,68,68,0.08);
+    }
+
+    .submit-btn {
+      width: 100%; padding: 14px;
+      background: linear-gradient(135deg, var(--cyan), var(--purple));
+      border: none; border-radius: var(--r-md);
+      color: #fff; font-size: 15px; font-weight: 700;
+      cursor: pointer; transition: all 0.2s; margin-top: 8px;
+    }
+    .submit-btn:hover { transform: translateY(-2px); box-shadow: var(--glow-cyan); }
+
+    /* ═══════════════════════════════════════════════════════
+       TOAST
+    ═══════════════════════════════════════════════════════ */
+    #toast {
+      position: fixed; bottom: 28px; right: 28px; z-index: 999;
+      padding: 14px 22px;
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: var(--r-md);
+      font-size: 14px; font-weight: 500;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+      transform: translateY(100px); opacity: 0;
+      transition: all 0.3s ease;
+      max-width: 320px;
+    }
+    #toast.show { transform: translateY(0); opacity: 1; }
+
+    /* ═══════════════════════════════════════════════════════
+       FOOTER
+    ═══════════════════════════════════════════════════════ */
+    footer {
+      position: relative; z-index: 1;
+      text-align: center; padding: 32px 40px;
+      border-top: 1px solid var(--border);
+      color: var(--text-dim); font-size: 13px;
+    }
+    footer a { color: var(--cyan); text-decoration: none; }
+
+    /* ═══════════════════════════════════════════════════════
+       LOADER
+    ═══════════════════════════════════════════════════════ */
+    .spinner {
+      display: inline-block;
+      width: 16px; height: 16px;
+      border: 2px solid rgba(255,255,255,0.2);
+      border-top-color: #fff;
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+      vertical-align: middle;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ═══════════════════════════════════════════════════════
+       RESPONSIVE
+    ═══════════════════════════════════════════════════════ */
+    @media (max-width: 900px) {
+      nav { padding: 14px 20px; }
+      .section { padding: 60px 20px; }
+      .stats-bar { grid-template-columns: repeat(2, 1fr); }
+      .ibm-inner { grid-template-columns: 1fr; gap: 32px; }
+      .result-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+
+    @media (max-width: 600px) {
+      .hero { padding: 50px 20px 40px; }
+      nav { flex-wrap: wrap; gap: 10px; }
+      .stats-bar { grid-template-columns: 1fr 1fr; }
+      .ibm-features { grid-template-columns: 1fr; }
+      .result-grid { grid-template-columns: 1fr; }
+      .how-grid { grid-template-columns: 1fr; }
+      .url-checker { flex-direction: column; padding: 12px; }
+      #checkBtn { width: 100%; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- NAVBAR -->
+  <nav>
+    <a href="#" class="nav-brand">
+      <div class="nav-logo">🛡️</div>
+      <span class="nav-title">WebSleuth AI</span>
+    </a>
+    <div class="nav-links">
+      <a href="#checker" class="active">Checker</a>
+      <a href="#verified">Verified Sites</a>
+      <a href="#how">How it Works</a>
+      <a href="#report">Report</a>
+    </div>
+    <div class="nav-badge">
+      <span class="pulse-dot"></span>
+      IBM LinuxONE Active
+    </div>
+  </nav>
+
+  <!-- HERO -->
+  <section class="hero" id="checker">
+    <div class="hero-eyebrow">
+      🔵 IBM LinuxONE &nbsp;·&nbsp; AI-Powered &nbsp;·&nbsp; Real-time Protection
+    </div>
+    <h1>Stop <span>Fake Websites</span><br/>Before They Stop You</h1>
+    <p>Instantly detect phishing and fake government websites. Our AI, powered by IBM LinuxONE's ultra-secure infrastructure, verifies URLs in milliseconds.</p>
+
+    <div class="url-checker">
+      <span style="font-size:18px; flex-shrink:0;">🔍</span>
+      <input type="text" id="urlInput" placeholder="Paste any URL to check — e.g. incometax-india.gov.co" autocomplete="off" spellcheck="false"/>
+      <button id="checkBtn">Analyze URL</button>
+    </div>
+
+    <div id="resultCard">
+      <div class="result-header">
+        <div class="result-icon" id="resultIcon"></div>
+        <div>
+          <div class="result-title" id="resultTitle"></div>
+          <div class="result-sub" id="resultURL"></div>
+        </div>
+      </div>
+
+      <div class="result-grid">
+        <div class="result-metric">
+          <div class="label">Risk Score</div>
+          <div class="value" id="riskScore" style="color:var(--danger)">--</div>
+        </div>
+        <div class="result-metric">
+          <div class="label">Confidence</div>
+          <div class="value" id="confidence" style="color:var(--cyan)">--</div>
+        </div>
+        <div class="result-metric">
+          <div class="label">AI Model v</div>
+          <div class="value" id="modelVersion" style="color:var(--purple-l)">--</div>
+        </div>
+      </div>
+
+      <div class="risk-bar-wrap">
+        <div class="risk-bar-label">
+          <span>Risk Level</span>
+          <span id="riskLabel">--</span>
+        </div>
+        <div class="risk-bar-track">
+          <div class="risk-bar-fill" id="riskBarFill" style="width:0%;"></div>
+        </div>
+      </div>
+
+      <div id="reasonBox" class="reason-text" style="display:none;"></div>
+      <div id="verifiedBox" class="verified-alert" style="display:none;"></div>
+    </div>
+  </section>
+
+  <!-- STATS -->
+  <div class="stats-bar">
+    <div class="stat-item">
+      <div class="stat-num" id="statChecked">0</div>
+      <div class="stat-label">URLs Analyzed</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-num" id="statBlocked">0</div>
+      <div class="stat-label">Threats Blocked</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-num" id="statSafe">0</div>
+      <div class="stat-label">Safe Sites</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-num" id="statSites">28</div>
+      <div class="stat-label">Verified Gov Sites</div>
+    </div>
+  </div>
+
+  <!-- VERIFIED SITES -->
+  <section class="section" id="verified">
+    <div class="section-header">
+      <div class="section-tag">Registry</div>
+      <h2>Verified Government Websites</h2>
+      <p>Cryptographically signed and tamper-proof registry hosted on IBM LinuxONE. Always access these official URLs.</p>
+    </div>
+
+    <div class="filter-bar">
+      <input type="text" class="filter-search" id="siteSearch" placeholder="🔍  Search by name, description, or domain..."/>
+      <button class="filter-btn active" id="filterAll">All</button>
+      <button class="filter-btn" id="filterTax">💰 Tax</button>
+      <button class="filter-btn" id="filterIdentity">🪪 Identity</button>
+      <button class="filter-btn" id="filterBanking">🏧 Banking</button>
+      <button class="filter-btn" id="filterTransport">🚄 Transport</button>
+      <button class="filter-btn" id="filterHealth">🏥 Health</button>
+      <button class="filter-btn" id="filterEducation">🎓 Education</button>
+      <button class="filter-btn" id="filterWelfare">👷 Welfare</button>
+      <button class="filter-btn" id="filterGovt">🇮🇳 Govt</button>
+    </div>
+
+    <div class="sites-grid" id="sitesGrid">
+      <!-- Populated by JS -->
+    </div>
+  </section>
+
+  <!-- HOW IT WORKS -->
+  <section class="section" id="how" style="padding-top:0;">
+    <div class="section-header">
+      <div class="section-tag">Technology</div>
+      <h2>How WebSleuth AI Works</h2>
+      <p>Multi-layer AI analysis running on IBM LinuxONE for maximum accuracy and security.</p>
+    </div>
+    <div class="how-grid">
+      <div class="how-card">
+        <div class="how-num">1</div>
+        <h3>URL Capture</h3>
+        <p>Browser extension intercepts every URL you visit before the page loads. Zero delay to your browsing experience.</p>
+      </div>
+      <div class="how-card">
+        <div class="how-num">2</div>
+        <h3>Feature Extraction</h3>
+        <p>16 URL signals extracted: domain similarity, subdomain depth, special chars, HTTPS, suspicious keywords, and more.</p>
+      </div>
+      <div class="how-card">
+        <div class="how-num">3</div>
+        <h3>AI Risk Scoring</h3>
+        <p>Our heuristic AI engine scores the URL 0–100 for risk. Trained on thousands of phishing patterns and improving daily from community reports.</p>
+      </div>
+      <div class="how-card">
+        <div class="how-num">4</div>
+        <h3>Registry Verification</h3>
+        <p>URL is checked against our IBM LinuxONE-hosted signed registry of 28+ verified government portals.</p>
+      </div>
+      <div class="how-card">
+        <div class="how-num">5</div>
+        <h3>Instant Alert</h3>
+        <p>You see a green ✅ or red ⚠️ warning in milliseconds. Fake sites get blocked with a redirect to the real portal.</p>
+      </div>
+      <div class="how-card">
+        <div class="how-num">6</div>
+        <h3>Community Learning</h3>
+        <p>Every user report updates the AI model in real-time. WebSleuth AI gets smarter with every use — a true living AI.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- IBM LINUXONE -->
+  <div class="ibm-section">
+    <div class="ibm-inner">
+      <div class="ibm-text">
+        <h2>Powered by<br/><span>IBM LinuxONE</span></h2>
+        <p>WebSleuth AI's backend runs exclusively on IBM LinuxONE — the world's most secure server platform. When you're protecting citizens from fake government websites, only the most secure infrastructure is acceptable.</p>
+        <div class="ibm-features">
+          <div class="ibm-feat">
+            <div class="ibm-feat-icon">🔐</div>
+            <div>
+              <h4>Pervasive Encryption</h4>
+              <p>Data encrypted at rest, in-transit, and in-use</p>
+            </div>
+          </div>
+          <div class="ibm-feat">
+            <div class="ibm-feat-icon">🔑</div>
+            <div>
+              <h4>HSM Key Management</h4>
+              <p>Hardware security modules sign the URL registry</p>
+            </div>
+          </div>
+          <div class="ibm-feat">
+            <div class="ibm-feat-icon">📋</div>
+            <div>
+              <h4>Tamper-Proof Audit</h4>
+              <p>Every URL check logged immutably</p>
+            </div>
+          </div>
+          <div class="ibm-feat">
+            <div class="ibm-feat-icon">⚡</div>
+            <div>
+              <h4>99.9999% Uptime</h4>
+              <p>Six nines reliability for critical infrastructure</p>
+            </div>
+          </div>
+          <div class="ibm-feat">
+            <div class="ibm-feat-icon">🛡️</div>
+            <div>
+              <h4>Confidential Computing</h4>
+              <p>IBM Secure Execution isolates sensitive data</p>
+            </div>
+          </div>
+          <div class="ibm-feat">
+            <div class="ibm-feat-icon">🌍</div>
+            <div>
+              <h4>Scalable to Millions</h4>
+              <p>Handles national-scale traffic with ease</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="ibm-visual">
+        <div style="font-size:12px; color:var(--cyan); font-weight:700; margin-bottom:14px; text-transform:uppercase; letter-spacing:1.5px;">
+          🔵 IBM LinuxONE — WebSleuth AI Node
+        </div>
+        <div class="server-graphic">
+          <div><span class="dim">$</span> <span class="green">systemctl status</span> websleuth-ai</div>
+          <div><span class="green">● websleuth-ai.service</span> <span class="dim">ACTIVE (running)</span></div>
+          <div class="dim">  └─ Loaded: /opt/websleuth-ai/main.py</div>
+          <div>&nbsp;</div>
+          <div><span class="cyan">→</span> Encryption: <span class="green">PERVASIVE ON</span></div>
+          <div><span class="cyan">→</span> HSM Status: <span class="green">CONNECTED</span></div>
+          <div><span class="cyan">→</span> Audit Log: <span class="green">TAMPER-PROOF</span></div>
+          <div><span class="cyan">→</span> Uptime: <span class="green">99.9999%</span></div>
+          <div>&nbsp;</div>
+          <div><span class="purple">AI Model</span> v<span id="liveModelVer">1</span> <span class="dim">| Feedback: </span><span id="liveFeedback">0</span><span class="dim"> entries</span></div>
+          <div><span class="dim">URLs analyzed today: </span><span id="liveTotal">0</span></div>
+          <div><span class="dim">Threats blocked: </span><span class="green" id="liveThreat">0</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- LIVE FEED -->
+  <section class="section" id="feed">
+    <div class="section-header">
+      <div class="section-tag">Live Feed</div>
+      <h2>Recent URL Checks</h2>
+      <p>Live feed of URLs analyzed by WebSleuth AI in this session.</p>
+    </div>
+    <div class="table-wrap">
+      <table class="feed-table">
+        <thead>
+          <tr>
+            <th>URL</th>
+            <th>Risk Score</th>
+            <th>Status</th>
+            <th>Time</th>
+          </tr>
+        </thead>
+        <tbody id="feedBody">
+          <tr>
+            <td colspan="4" style="text-align:center; color:var(--text-dim); padding:32px;">
+              No URLs checked yet. Use the analyzer above!
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- REPORT -->
+  <section class="section" id="report">
+    <div class="section-header">
+      <div class="section-tag">Community</div>
+      <h2>Report a Suspicious Site</h2>
+      <p>Help improve WebSleuth AI's AI. Your report is logged on IBM LinuxONE and updates the model instantly.</p>
+    </div>
+
+    <div class="report-wrap">
+      <div class="form-group">
+        <label class="form-label" for="reportURL">Website URL</label>
+        <input type="text" class="form-input" id="reportURL" placeholder="https://suspicious-site.com"/>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Is this site phishing / fake?</label>
+        <div class="toggle-group">
+          <button class="toggle-btn selected-danger" id="btnPhish">⚠️ Yes, it's Fake/Phishing</button>
+          <button class="toggle-btn" id="btnSafe">✅ No, it's Safe</button>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label" for="reportNotes">Additional Notes (optional)</label>
+        <input type="text" class="form-input" id="reportNotes" placeholder="e.g. Pretends to be income tax portal"/>
+      </div>
+      <button class="submit-btn">Submit Report to WebSleuth AI</button>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <p>🛡️ <strong>WebSleuth AI</strong> — AI-powered fake website protection &nbsp;·&nbsp; Built on <strong>IBM LinuxONE</strong> &nbsp;·&nbsp; Hackathon 2026</p>
+    <p style="margin-top:6px;">API: <a href="http://localhost:8001/docs" target="_blank">localhost:8000/docs</a> &nbsp;·&nbsp; Model v<span id="footerModel">1</span></p>
+  </footer>
+
+  <div id="toast"></div>
+
+  <script src="dashboard.js"></script>
+</body>
+</html>
