@@ -1,0 +1,57 @@
+{
+  "manifest_version": 3,
+  "name": "WebSleuth AI - AI Fake Website Protector",
+  "version": "2.0",
+  "description": "Detects fake government and phishing websites in real-time using AI on IBM LinuxONE.",
+  "permissions": [
+    "activeTab",
+    "tabs",
+    "storage",
+    "webNavigation",
+    "scripting"
+  ],
+  "host_permissions": [
+    "http://localhost:8001/*",
+    "<all_urls>"
+  ],
+  "options_page": "dashboard.html",
+  "action": {
+    "default_popup": "popup.html",
+    "default_badge_text": "",
+    "default_icon": {
+      "16": "icons/icon16.png",
+      "48": "icons/icon48.png"
+    }
+  },
+  "background": {
+    "service_worker": "background.js"
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "<all_urls>"
+      ],
+      "js": [
+        "content.js"
+      ],
+      "run_at": "document_idle"
+    }
+  ],
+  "web_accessible_resources": [
+    {
+      "resources": [
+        "dashboard.html",
+        "dashboard.js",
+        "warning-banner.css"
+      ],
+      "matches": [
+        "<all_urls>"
+      ]
+    }
+  ],
+  "icons": {
+    "16": "icons/icon16.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  }
+}
