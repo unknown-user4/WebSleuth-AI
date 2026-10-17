@@ -302,16 +302,8 @@ C:\Users\theja\Desktop\code apex v5\codeapex.pem   ← Backup copy
 
 ---
 
-## 📦 GITHUB UPLOAD CHECKLIST
+## 📦 RECOMMENDED GIT COMMANDS
 
-Before pushing to GitHub:
-- [ ] Delete or exclude: `codeapex.pem` (already in `.gitignore`)
-- [ ] Delete or exclude: `extension_backup_v1/`
-- [ ] Delete or exclude: `New v2/`
-- [ ] Delete or exclude: `fix_sites.py` (internal tooling)
-- [ ] Keep: `extension/`, `backend/`, `README.md`, `.gitignore`, `deploy.sh`, `start-tunnel.ps1`
-
-**Recommended git commands:**
 ```bash
 git init
 git add .
@@ -322,7 +314,7 @@ git push -u origin main
 
 ---
 
-## 🏆 KEY TALKING POINTS (For Judges)
+## 🏆 KEY POINTS
 
 1. **Real AI on Real Hardware** — Not a mock. The AI model (v5) is live on IBM LinuxONE at `148.100.98.166`
 2. **Hardware Encryption** — IBM LinuxONE's CPACF chip encrypts every URL check at the hardware level
